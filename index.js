@@ -1,10 +1,9 @@
 const express = require("express");
 const app = express();
-const port = 786;
+var config = require("./config/keys");
 var cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const url = `mongodb+srv://Aliasger:ZxUrrh32cQsCj9GG@cluster0.cmiu6.mongodb.net/worklog?retryWrites=true&w=majority`;
 
 const connectionParams = {
   useNewUrlParser: true,
@@ -13,7 +12,7 @@ const connectionParams = {
   useCreateIndex: true,
 };
 mongoose
-  .connect(url, connectionParams)
+  .connect(config.mongoURI, connectionParams)
   .then(() => {
     console.log("Connected to database ");
   })
@@ -28,8 +27,11 @@ app.use(bodyParser.json());
 // parse requests of content-type: application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// users routes
+// Users routes
 require("./routes/users.routes.js")(app);
+
+// Employees routes
+require("./routes/employees.routes")(app);
 
 // define a simple route
 app.get("/", (req, res) => {
@@ -38,6 +40,6 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+app.listen(config.port, () => {
+  console.log(`App listening at http://localhost:${config.port}`);
 });
