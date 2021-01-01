@@ -1,39 +1,22 @@
 module.exports = (app) => {
-  const jwt = require("jsonwebtoken");
-  const config = require("../config/keys");
   const employees = require("../controllers/employees.controller");
-
-  const ensureAuthenticated = (req, res, next) => {
-    console.log("ensureAuthenticated", req.headers);
-    if (
-      req.headers &&
-      req.headers.authorization &&
-      req.headers.authorization.split(" ")[0] === "JWT"
-    ) {
-      jwt.verify(
-        req.headers.authorization.split(" ")[1],
-        config.jwtSecret,
-        function (err, decode) {
-          if (err) req.user = undefined;
-          req.user = decode;
-          next();
-        }
-      );
-    } else {
-      req.user = undefined;
-      next();
-    }
-  };
+  const Auth = require("../middilware/auth.middilware");
 
   app.post("/login-employee", employees.loginEmployee);
 
-  app.get("/employees", ensureAuthenticated, employees.findAllEmployees);
+  app.get("/employees", Auth.ensureAuthenticated, employees.findAllEmployees);
 
-  app.post("/add-employee", ensureAuthenticated, employees.addEmployee);
+  app.post("/add-employee", Auth.ensureAuthenticated, employees.addEmployee);
+
+  app.put(
+    "/employee/:employeeId",
+    Auth.ensureAuthenticated,
+    employees.updateEmployee
+  );
 
   app.delete(
     "/employee/:employeeId",
-    ensureAuthenticated,
+    Auth.ensureAuthenticated,
     employees.deleteEmployee
   );
 };

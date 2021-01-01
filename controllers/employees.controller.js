@@ -74,7 +74,7 @@ exports.addEmployee = (req, res) => {
   Employees.findOne({ email: req.body.email }).then((emp) => {
     if (emp) {
       res.status(400).send({
-        message: req.body.email + "email already register",
+        message: req.body.email + " email already register",
       });
     } else {
       employee.save().then((data) => {
@@ -94,6 +94,54 @@ exports.addEmployee = (req, res) => {
       });
     }
   });
+};
+
+// Update Employee
+exports.updateEmployee = (req, res) => {
+  var id = req.params.employeeId;
+  if (!id) {
+    res.status(400).send({
+      message: "Employee Id is required",
+    });
+  }
+
+  if (!req.body) {
+    res.status(400).send({
+      message: "Employee content can not be empty",
+    });
+  }
+
+  Employees.findByIdAndUpdate(
+    id,
+    {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      designation: req.body.designation,
+      email: req.body.email,
+    },
+    { new: true }
+  )
+    .then((result) => {
+      if (!result) {
+        return res.status(404).send({
+          message: "Employee not found with id " + id,
+        });
+      }
+      res.status(200).send({
+        message: "Employee update successfully",
+        data: result,
+      });
+    })
+    .catch((err) => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: "Employee not found with id " + id,
+        });
+      }
+      return res.status(500).send({
+        message: "Error updating employee with id " + id,
+      });
+    });
 };
 
 // Delete Employee
