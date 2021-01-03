@@ -187,7 +187,6 @@ exports.addTasks = async (req, res) => {
 const getSingleEmployee = async (id) => {
   try {
     const employees = await Employees.find({ _id: id }).exec();
-    console.log("employees", employees);
     return employees;
   } catch (err) {
     return "500";
@@ -197,7 +196,6 @@ const getSingleEmployee = async (id) => {
 const getSingleClient = async (id) => {
   try {
     const client = await Clients.find({ _id: id }).exec();
-    console.log("client", client);
     return client;
   } catch (err) {
     return "500";
