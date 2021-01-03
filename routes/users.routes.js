@@ -1,13 +1,16 @@
 module.exports = (app) => {
   const user = require("../controllers/users.controller.js");
+  const Auth = require("../middilware/auth.middilware");
 
-  app.get("/users", user.findAll);
+  app.post("/login-user", user.loginUser);
 
-  app.post("/user", user.create);
+  app.get("/users", Auth.ensureAuthenticated, user.findAll);
 
-  app.get("/users/:userId", user.findOne);
+  app.post("/user", Auth.ensureAuthenticated, user.create);
 
-  app.put("/users/:userId", user.update);
+  app.get("/users/:userId", Auth.ensureAuthenticated, user.findOne);
 
-  app.delete("/users/:userId", user.delete);
+  app.put("/users/:userId", Auth.ensureAuthenticated, user.update);
+
+  app.delete("/users/:userId", Auth.ensureAuthenticated, user.delete);
 };

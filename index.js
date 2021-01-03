@@ -28,10 +28,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Users routes
-require("./routes/users.routes.js")(app);
+require("./routes/users.routes")(app);
 
 // Employees routes
 require("./routes/employees.routes")(app);
+
+// Clients routes
+require("./routes/client.routes")(app);
+
+// Tasks routes
+require("./routes/tasks.routes")(app);
 
 // define a simple route
 app.get("/", (req, res) => {

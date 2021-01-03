@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const Employees = require("../models/employees.modal");
+const Employees = require("../models/employees.model");
 const config = require("../config/keys");
 
 // Login Employee
@@ -24,6 +24,7 @@ exports.loginEmployee = (req, res) => {
               config.jwtSecret
             ),
             message: "Employee logged In",
+            data: employee,
           });
         } else {
           return res.status(401).send({
@@ -41,7 +42,9 @@ exports.loginEmployee = (req, res) => {
 exports.findAllEmployees = (req, res) => {
   Employees.find()
     .then((employees) => {
-      res.status(200).send(employees);
+      res.status(200).send({
+        data: employees,
+      });
     })
     .catch((err) => {
       res.status(400).send({
@@ -163,6 +166,30 @@ exports.deleteEmployee = (req, res) => {
       }
       return res.status(500).send({
         message: "Could not delete employee with id " + req.params.employeeId,
+      });
+    });
+};
+
+// Update Employee
+exports.findOne = (req, res) => {
+  var id = req.params.employeeId;
+  Employees.findById(id)
+    .then((employee) => {
+      if (!employee) {
+        return res.status(404).send({
+          message: "Employee not found with id " + id,
+        });
+      }
+      res.status(200).send(employee);
+    })
+    .catch((err) => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: "Employee not found with id " + id,
+        });
+      }
+      return res.status(500).send({
+        message: "Error retrieving employee with id " + id,
       });
     });
 };

@@ -1,5 +1,41 @@
 const Users = require("../models/users.model.js");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const config = require("../config/keys");
+
+// Login User
+exports.loginUser = (req, res) => {
+  Users.findOne(
+    {
+      email: req.body.email,
+    },
+    (err, user) => {
+      if (user === null) {
+        res.status(400).send(err);
+      } else {
+        if (user.validPassword(req.body.password)) {
+          return res.status(201).send({
+            token: jwt.sign(
+              {
+                email: user.email,
+                name: user.name,
+                _id: user._id,
+              },
+              config.jwtSecret
+            ),
+            message: "User logged In",
+            data: user,
+          });
+        } else {
+          return res.status(401).send({
+            message: "Authentication failed. Invalid user email or password.",
+            user: user,
+          });
+        }
+      }
+    }
+  );
+};
 
 exports.create = (req, res) => {
   if (!req.body) {
@@ -16,25 +52,38 @@ exports.create = (req, res) => {
     address: req.body.address,
   });
 
-  user
-    .save()
-    .then((data) => {
-      res.status(200).send({
-        message: "User added successfully",
-        data: data,
+  user.setPassword(req.body.password);
+
+  Users.findOne({ email: req.body.email }).then((singleUser) => {
+    if (singleUser) {
+      res.status(400).send({
+        message: req.body.email + " email already register",
       });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating the Users.",
-      });
-    });
+    } else {
+      user
+        .save()
+        .then((data) => {
+          res.status(200).send({
+            message: "User added successfully",
+            data: data,
+          });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred while creating the Users.",
+          });
+        });
+    }
+  });
 };
 
 exports.findAll = (req, res) => {
   Users.find()
     .then((users) => {
-      res.status(200).send(users);
+      res.status(200).send({
+        data: users,
+      });
     })
     .catch((err) => {
       res.status(500).send({

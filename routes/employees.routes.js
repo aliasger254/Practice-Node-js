@@ -14,6 +14,8 @@ module.exports = (app) => {
     employees.updateEmployee
   );
 
+  app.get("/employee/:employeeId", Auth.ensureAuthenticated, employees.findOne);
+
   app.delete(
     "/employee/:employeeId",
     Auth.ensureAuthenticated,
