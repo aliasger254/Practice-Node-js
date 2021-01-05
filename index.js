@@ -39,6 +39,9 @@ require("./routes/client.routes")(app);
 // Tasks routes
 require("./routes/tasks.routes")(app);
 
+// WorkLogs routes
+require("./routes/employee-log-routes")(app);
+
 // define a simple route
 app.get("/", (req, res) => {
   res.json({
